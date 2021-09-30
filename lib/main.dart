@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'question.dart';
 import 'answer.dart';
+import 'quiz.dart';
+import 'result.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,67 +14,57 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var _questions = [
+  final _questions = const [
     {
       'questionText': 'What is your name',
       'answers': [
-        'Arthur',
-        'Robin',
-        'Galahad',
-        'Lancelot',
+        {'text': 'Arthur', 'score': 5},
+        {'text': 'Robin', 'score': 1},
+        {'text': 'Galahad', 'score': 3},
+        {'text': 'Lancelot', 'score': 4},
       ],
     },
     {
       'questionText': 'What is your quest',
       'answers': [
-        'To seek the holy grail',
-        'To unite England',
-        'To hide in a wooden rabbit',
+        {'text': 'To seek the holy grail', 'score': 4},
+        {'text': 'To unite England', 'score': 5},
+        {'text': 'To hide in a wooden rabbit', 'score': 2},
       ],
     },
     {
       'questionText': 'What is your favorite color',
       'answers': [
-        'Blue',
-        'Yellow',
-        'Black',
+        {'text': 'Blue', 'score': 5},
+        {'text': 'Yellow', 'score': 2},
+        {'text': 'Black', 'score': 3},
       ],
     },
   ];
 
-  var _currentQuestionIndex = 0;
+  var _questionIndex = 0;
+  var _totalScore = 0;
 
-  int get _questionIndex {
-    return _currentQuestionIndex;
-  }
-
-  set _questionIndex(int newIndex) {
-    if (newIndex >= _questions.length) {
-      newIndex = 0;
-    }
-    setState(() => {_currentQuestionIndex = newIndex});
-  }
-
-  void buttonPressed() {
-    _questionIndex++;
+  void buttonPressed(int score) {
+    _totalScore += score;
+    setState(() => _questionIndex++);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-      appBar: AppBar(
-        title: Text('The Coolest App'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('The Coolest App'),
+        ),
+        body: _questionIndex >= _questions.length
+            ? Result(_totalScore)
+            : Quiz(
+                _questions,
+                _questionIndex,
+                buttonPressed,
+              ),
       ),
-      body: Column(
-        children: [
-          Question(_questions[_questionIndex]['questionText'] as String),
-          ...(_questions[_questionIndex]['answers'] as List<String>)
-              .map((answer) {
-            return Answer(buttonPressed, answer);
-          }).toList(),
-        ],
-      ),
-    ));
+    );
   }
 }
